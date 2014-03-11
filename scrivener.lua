@@ -4,7 +4,7 @@ local EMAIL =
 	"@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?"
 
 local valid = function(self)
-	self.validate(self)
+	self:validate()
 
 	return #self.errors == 0, self.errors
 end
@@ -49,12 +49,13 @@ local methods = {
 --	 end)
 --
 local new = function(validator)
-	local self = setmetatable(
-		{ validate = validator },
-		{__index = methods}
-	)
+	local self = {
+		validate = validator
+	}
 
-	return function (attributes)
+	setmetatable(self, {__index = methods})
+
+	return function(attributes)
 		self.attributes = attributes
 		self.errors = {}
 
