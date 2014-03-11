@@ -4,41 +4,41 @@ local EMAIL =
 	"@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?"
 
 local new = function(self, attributes)
-    local object = {
-        attributes = attributes,
-        errors = {}
-    }
+	local object = {
+		attributes = attributes,
+		errors = {}
+	}
 
-    setmetatable(object, {__index = self})
+	setmetatable(object, {__index = self})
 
-    return object
+	return object
 end
 
 local valid = function(self)
-    self.validate(self)
+	self.validate(self)
 
-    return #self.errors == 0, self.errors
+	return #self.errors == 0, self.errors
 end
 
 local assert_email = function(self, att)
-    local val = self.attributes[att]
+	local val = self.attributes[att]
 
-    self:assert_value(
-        val and string.match(val, EMAIL),
-        {att, "not_email"}
-    )
+	self:assert_value(
+		val and string.match(val, EMAIL),
+		{att, "not_email"}
+	)
 end
 
 local assert_present = function(self, att)
-    local val = self.attributes[att]
+	local val = self.attributes[att]
 
-    self:assert_value(val and val ~= '', {att, "not_present"})
+	self:assert_value(val and val ~= '', {att, "not_present"})
 end
 
 local assert_value = function(self, val, tuple)
-    if not val then
-        table.insert(self.errors, tuple)
-    end
+	if not val then
+		table.insert(self.errors, tuple)
+	end
 end
 
 local methods = {
@@ -53,22 +53,24 @@ local methods = {
 --
 -- @example
 --
---     local scrivener = require("scrivener")
+--	 local scrivener = require("scrivener")
 --
---     local signup = scrivener(function (self)
---         self:assert_email('email')
---         self:assert_present('password')
---     end)
+--	 local signup = scrivener(function (self)
+--		 self:assert_email('email')
+--		 self:assert_present('password')
+--	 end)
 --
 local function wrap(validator)
 	-- initialize object with `methods` as the concept of `self`.
-    local object = new(methods)
+	local object = new(methods)
 
-    function object.validate(self)
-        validator(self)
-    end
+	object.validate = validator
 
-    return object
+	return function (attributes)
+		local o = object:new(attributes)
+		
+		return o:valid()
+	end
 end
 
 return wrap
