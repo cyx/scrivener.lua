@@ -48,7 +48,7 @@ local methods = {
 --		 self:assert_present('password')
 --	 end)
 --
-local new = function(validator)
+return function(validator)
 	local self = {
 		validate = validator
 	}
@@ -62,5 +62,3 @@ local new = function(validator)
 		return self:valid()
 	end
 end
-
-return new
