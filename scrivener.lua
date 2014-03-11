@@ -23,7 +23,7 @@ end
 local assert_email = function(self, att)
     local val = self.attributes[att]
 
-    self:assert(
+    self:assert_value(
         val and string.match(val, EMAIL),
         {att, "not_email"}
     )
@@ -32,10 +32,10 @@ end
 local assert_present = function(self, att)
     local val = self.attributes[att]
 
-    self:assert(val and val ~= '', {att, "not_present"})
+    self:assert_value(val and val ~= '', {att, "not_present"})
 end
 
-local assert = function(self, val, tuple)
+local assert_value = function(self, val, tuple)
     if not val then
         table.insert(self.errors, tuple)
     end
@@ -46,7 +46,7 @@ local methods = {
 	valid = valid,
 	assert_present = assert_present,
 	assert_email = assert_email,
-	assert = assert,
+	assert_value = assert_value,
 }
 
 -- @module interface
