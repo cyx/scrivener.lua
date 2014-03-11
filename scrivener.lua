@@ -1,7 +1,4 @@
--- @class Scrivener
-local Scrivener = {}
-
-function Scrivener.new(self, attributes)
+local new = function(self, attributes)
     local object = {
         attributes = attributes,
         errors = {}
@@ -12,13 +9,13 @@ function Scrivener.new(self, attributes)
     return object
 end
 
-function Scrivener.valid(self)
+local valid = function(self)
     self.validate(self)
 
     return #self.errors == 0, self.errors
 end
 
-function Scrivener.assert_email(self, att)
+local assert_email = function(self, att)
     local regex =
         "[A-Za-z0-9%.%%%+%-]+" .. 
         "@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?"
@@ -31,17 +28,25 @@ function Scrivener.assert_email(self, att)
     )
 end
 
-function Scrivener.assert_present(self, att)
+local assert_present = function(self, att)
     local val = self.attributes[att]
 
     self:assert(val and val ~= '', {att, "not_present"})
 end
 
-function Scrivener.assert(self, val, tuple)
+local assert = function(self, val, tuple)
     if not val then
         table.insert(self.errors, tuple)
     end
 end
+
+local methods = {
+	new = new,
+	valid = valid,
+	assert_present = assert_present,
+	assert_email = assert_email,
+	assert = assert,
+}
 
 -- @module interface
 --
@@ -55,7 +60,8 @@ end
 --     end)
 --
 local function wrap(validator)
-    local object = Scrivener:new()
+	-- initialize object with `methods` as the concept of `self`.
+    local object = new(methods)
 
     function object.validate(self)
         validator(self)
