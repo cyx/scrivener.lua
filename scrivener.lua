@@ -3,17 +3,6 @@ local EMAIL =
 	"[A-Za-z0-9%.%%%+%-]+" ..
 	"@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?"
 
-local new = function(self, attributes)
-	local object = {
-		attributes = attributes,
-		errors = {}
-	}
-
-	setmetatable(object, {__index = self})
-
-	return object
-end
-
 local valid = function(self)
 	self.validate(self)
 
@@ -42,7 +31,6 @@ local assert_value = function(self, val, tuple)
 end
 
 local methods = {
-	new = new,
 	valid = valid,
 	assert_present = assert_present,
 	assert_email = assert_email,
@@ -60,17 +48,18 @@ local methods = {
 --		 self:assert_present('password')
 --	 end)
 --
-local function wrap(validator)
-	-- initialize object with `methods` as the concept of `self`.
-	local object = new(methods)
-
-	object.validate = validator
+local new = function(validator)
+	local self = setmetatable(
+		{ validate = validator },
+		{__index = methods}
+	)
 
 	return function (attributes)
-		local o = object:new(attributes)
-		
-		return o:valid()
+		self.attributes = attributes
+		self.errors = {}
+
+		return self:valid()
 	end
 end
 
-return wrap
+return new
