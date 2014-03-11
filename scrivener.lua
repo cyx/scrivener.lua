@@ -1,3 +1,8 @@
+-- regex for matching emails in assert_email
+local EMAIL =
+	"[A-Za-z0-9%.%%%+%-]+" ..
+	"@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?"
+
 local new = function(self, attributes)
     local object = {
         attributes = attributes,
@@ -16,14 +21,10 @@ local valid = function(self)
 end
 
 local assert_email = function(self, att)
-    local regex =
-        "[A-Za-z0-9%.%%%+%-]+" .. 
-        "@[A-Za-z0-9%.%%%+%-]+%.%w%w%w?%w?"
-
     local val = self.attributes[att]
 
     self:assert(
-        val and string.match(val, regex),
+        val and string.match(val, EMAIL),
         {att, "not_email"}
     )
 end
