@@ -14,13 +14,26 @@ local signup = scrivener(function (self)
     self:assert_present('fname')
 end)
 
-local filter = signup:new({
+-- scenario 1: valid
+local valid, errors = signup({
     email = "cyx@cyx.is",
     fname = "Cyril",
     lname = "David"
 })
 
-assert(filter:valid())
+assert(valid)
+
+-- scenario 2: invalid
+local valid, errors = signup({
+    email = "cyx@cyx.is",
+})
+
+assert(not valid)
+assert(errors[1][1] == 'lname')
+assert(errors[1][2] == 'not_present')
+
+assert(errors[2][1] == 'fname')
+assert(errors[2][2] == 'not_present')
 ```
 
 ## license
